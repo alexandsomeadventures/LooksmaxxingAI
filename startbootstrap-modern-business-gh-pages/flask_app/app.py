@@ -4,6 +4,7 @@ import openai
 import base64
 from dotenv import load_dotenv
 import json
+import replicate
 import requests
 app = Flask(__name__)
 load_dotenv()
@@ -42,7 +43,7 @@ def upload():
             {
                 "role": "system",
                 "content": '''
-                    just make search term. nothing else
+                    You are a virtual sales assistant for Amazon, helping customers choose clothes based on their photo. When a request is made, return a JSON object with the key 'top' and the summarized search term for Amazon. Return only the JSON object without ```json ```.
                 '''
             },
             {
@@ -58,20 +59,36 @@ def upload():
             }
         ]
     )
-    search_term = completion.choices[0].message.content.strip()
+    # print(completion.choices[0].message.content.strip())
+    # search_term = json.loads(completion.choices[0].message.content.strip())["top"]
 
     # Prepare parameters for the Rainforest API request
-    params = {
-        'api_key': '359CCE8E59FA4CD38A87752395A15F24',
-        'amazon_domain': 'amazon.com',
-        'type': 'search',
-        'search_term': search_term  # Use the generated search term
-    }
+    # params = {
+    #     'api_key': '359CCE8E59FA4CD38A87752395A15F24',
+    #     'amazon_domain': 'amazon.com',
+    #     'type': 'search',
+    #     'search_term': search_term  # Use the generated search term
+    # }
 
-    # Make the HTTP GET request to Rainforest API
-    response = requests.get('https://api.rainforestapi.com/request', params=params)
-    print(json.dumps(response.json()))
+    # response = requests.get('https://api.rainforestapi.com/request', params=params)
+    # print(type(response))
+    # first_three = response[:3].json()
+    # print(jsonify(first_three))
+    wear()
     return Response(status=204)# for flask not to trigger redirect error
+
+def wear():
+    output = replicate.run(
+    "viktorfa/oot_diffusion:9f8fa4956970dde99689af7488157a30aa152e23953526a605df1d77598343d7",
+    input={
+        "seed": 0,
+        "steps": 20,
+        "model_image": "https://raw.githubusercontent.com/viktorfa/oot_diffusion/main/oot_diffusion/assets/model_1.png",
+        "garment_image": "https://replicate.delivery/pbxt/KTgyzr0WNtcgwN82xEEcc3zoydD8ooXPzMHC18fKZSWu9W5I/blue_jacket.webp",
+        "guidance_scale": 2
+        }
+    )
+    print(output)
 @app.route('/upload/<filename>')
 def uploaded_file(filename):
     print("entered uploaded_file")
