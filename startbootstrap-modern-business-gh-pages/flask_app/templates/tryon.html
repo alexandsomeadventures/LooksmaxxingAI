@@ -6,7 +6,6 @@
     <title>Search and Upload</title>
     <!-- Add Google Fonts for better typography -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <script src="js/scripts.js" defer></script>
     <style>
         /* Reset some basic styles */
         body, h1, input, button {
@@ -16,7 +15,6 @@
 
         /* Center everything */
         body {
-            
             background: #f3f4f6;
             height: 100vh;
             display: flex;
@@ -35,7 +33,6 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
-            
             align-items: center;
             width: 400px;
         }
@@ -88,9 +85,12 @@
             position: relative;
             overflow: hidden;
             display: inline-block;
-            padding: 20%;
         }
-
+        .upload-btn-wrapper img {
+            max-width: 100%; 
+            padding-top: 20%;
+            padding-bottom: 20%;
+        }
         .upload-btn-wrapper button {
             color: white;
             padding: 10px 20px;
@@ -99,6 +99,7 @@
             cursor: pointer;
             transition: background 0.3s ease;
             background: none;
+            z-index: 50;
         }
 
         .upload-btn-wrapper input[type="file"] {
@@ -123,27 +124,33 @@
             .input-group button {
                 width: 40%;
             }
-
         }
     </style>
 </head>
 <body>
     <div class="container">
-
+        <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
         <div class="upload-btn-wrapper">
-            <button id="uploadBtn"><img src="assets/upload_image.png" alt="Upload"></button>
-            <input type="file" id="fileInput" accept="image/*">
-            <h4>Choose a file or drag it here.</h4>
+            <!-- Label to trigger file input -->
+            
+                <label for="fileInput" class="upload-label">
+                    <!-- Use url_for to reference the static image -->
+                    <img src="{{ url_for('static', filename='images/upload_image.png') }}">
+                </label>
+                <!-- Hidden file input -->
+                <input type="file" id="fileInput" name="file" accept="image/*" required>
+                <h4>Choose a file or drag it here.</h4>
+
+            
         </div>
 
         <h1>Search and Upload</h1>
 
         <div class="input-group">
-            <input type="text" id="searchTextInput" placeholder="Short sleeves neck">
-            <button id="searchBtn">Try</button>
+            <input type="text" name="search_query" placeholder="Short sleeves neck" required>
+            <button type="submit">Try</button>
         </div>
-
+    </form>
     </div>
-    
 </body>
 </html>
